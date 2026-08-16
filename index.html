@@ -38766,14 +38766,14 @@ const chatTitle = friend.isGroup ? `${friend.name} (${friend.members.length})` :
                 return;
             }
             const messages = chatHistories[currentChatFriendId] || [];
-            const imageCount = messages.filter(m => m && m.type === 'image').length;
+            const imageCount = messages.filter(m => m && m.contentType === 'image').length;
             if (imageCount === 0) {
                 showAlert('当前聊天没有图片消息');
                 return;
             }
             showConfirm(`确定要删除当前聊天的 ${imageCount} 张图片吗？文字/语音/表情包将保留。`, async (confirmed) => {
                 if (!confirmed) return;
-                chatHistories[currentChatFriendId] = messages.filter(m => !(m && m.type === 'image'));
+                chatHistories[currentChatFriendId] = messages.filter(m => !(m && m.contentType === 'image'));
                 await saveData();
                 if (typeof renderInitialMessages === 'function') {
                     renderInitialMessages();
