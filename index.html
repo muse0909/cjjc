@@ -23048,6 +23048,10 @@ filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25));
                 <label class="form-label">清空聊天记录</label>
                 <div class="form-value-display" style="font-size: 12px;">清空</div>
             </div>
+            <div class="form-group-row clickable" onclick="clearChatImages()">
+                <label class="form-label">清理聊天图片</label>
+                <div class="form-value-display" style="font-size: 12px;">仅删图</div>
+            </div>
             <div class="form-group-row">
     <label class="form-label" style="color: #ff3b30;">加入黑名单</label>
     <label class="toggle-switch bw-switch">
@@ -38755,6 +38759,28 @@ const chatTitle = friend.isGroup ? `${friend.name} (${friend.members.length})` :
         showAlert('聊天记录已清空');
     });
 }
+
+        async function clearChatImages() {
+            if (!currentChatFriendId) {
+                showAlert('当前没有打开的聊天');
+                return;
+            }
+            const messages = chatHistories[currentChatFriendId] || [];
+            const imageCount = messages.filter(m => m && m.type === 'image').length;
+            if (imageCount === 0) {
+                showAlert('当前聊天没有图片消息');
+                return;
+            }
+            showConfirm(`确定要删除当前聊天的 ${imageCount} 张图片吗？文字/语音/表情包将保留。`, async (confirmed) => {
+                if (!confirmed) return;
+                chatHistories[currentChatFriendId] = messages.filter(m => !(m && m.type === 'image'));
+                await saveData();
+                if (typeof renderInitialMessages === 'function') {
+                    renderInitialMessages();
+                }
+                showAlert(`已清理 ${imageCount} 张图片`);
+            });
+        }
 
         function openPersonalSettings() {
     // 不再打开旧的人设页面，而是直接跳转到新的人设列表页面
